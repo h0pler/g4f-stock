@@ -30,7 +30,8 @@ def askGPT(prompt):
     global apiCost
     print(prompt)
     resp = g4f.ChatCompletion.create(
-        model="gpt-4", 
+        model="gpt-4",
+        provider=g4f.Provider.Bing, 
         messages=prompt
         )
     # print(resp)
