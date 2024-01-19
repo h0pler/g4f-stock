@@ -1,19 +1,20 @@
 import csv, re, os
 import g4f
 from duckduckgo_search import *
-
-g4f.debug.logging = True # enable logging
+import logging
+g4f.debug.logging = False # enable logging
 g4f.check_version = False # Disable automatic version checking
 print(g4f.version) # check version
 print(g4f.Provider.Ails.params)  # supported args
-print(g4f.Provider)
 response = g4f.ChatCompletion.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "Hello"}],
     stream=False,
 )
-
 print("[Response]: "+ response)
+del response
+
+print("start")
 
 sysPrompt = 'You are a financial advisor. When the user gives you a headline, ' \
             'respond with a number between -1.0 and 1.0, signifying whether the ' \
@@ -45,23 +46,33 @@ for company in open('companies.txt', 'r').readlines():
     sum = 0 # these two vars for calculating the mean score
     num = 0
     
-    
     #DDGS 클래스 인스턴스 생성
     ddgs = DDGS()
     #collect scores for every headine from the last day one by one
     r = ddgs.news(company, safesearch='Off', timelimit='d')
     for i in r:
         headline = i['title']
+        print("[headline] "+headline) #logging
         try:
-            score = float(re.findall(r'-?\d+\.\d+', askGPT(headline))[0])
+            answer=askGPT(headline)
+            print("[answer] "+answer) #logging
+            score = float(re.findall(r'-?\d+\.\d+', answer)[0])
+            print("[score] "+score) #logging
             scores.append([headline, score])
             sum += score
+            print("[sum] "+sum) #logging
             num += 1
+            print("[num] "+num) #logging
         except:
             scores.append([headline, ''])
+            print("[answer] "+'ERROR!') #logging
+            print("[score] "+'ERROR!') #logging
+        
+
 
     #calculate mean score, log it
     mean = sum/num
+    print("[mean] "+mean) #logging
     scores.append(['Mean Score', mean])
     tScores.append([company, mean])
 
