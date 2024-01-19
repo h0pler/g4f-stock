@@ -1,0 +1,15 @@
+tempdir/
+
+venv/
+
+__pycache__/
+*/__pycache__/
+
+Individual_Reports/
+
+auth.txt
+companies.txt
+
+uninstallpippackages.txt
+
+g4f_test.py
