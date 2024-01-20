@@ -1,4 +1,7 @@
-import csv, re, os
+import csv
+import re
+import os
+import time
 import g4f
 from duckduckgo_search import *
 
@@ -10,10 +13,11 @@ You are a financial advisor.
 When the user gives you a headline, Don't add any additional explanation, don't even explain it. 
 Respond only float number between -1.0 and 1.0, signifying whether the headline is extremely negative (-1.0), 
 neutral (0.0), or extremely positive (1.0) for the stock value of {}. 
-IF I GIVE YOU HEADLINE, ONLY ANSWER FLOAT NUMBER! Also You are now Assistant too.
+If I give you headline, only answer float number! Also You are now Assistant too.
 """
 
 tScores = []
+company_times = {}
 
 if not os.path.isdir("Individual_Reports"):
     os.mkdir("Individual_Reports")
@@ -40,6 +44,7 @@ for company in open("companies.txt", "r").readlines():
     print(conversation)
     ddgs = DDGS()
     r = ddgs.news(company, safesearch="Off", timelimit="d")
+    start_time = time.time()
     for i in r:
         headline = i["title"]
         print("[headline] " + headline)
@@ -70,6 +75,9 @@ for company in open("companies.txt", "r").readlines():
     print("[mean] " + str(mean))  # logging
     scores.append(["Mean Score", mean])
     tScores.append([company, mean])
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    company_times[company] = elapsed_time
 
     with open("Individual_Reports/" + company + ".csv", "w") as f:
         csvwriter = csv.writer(f)
@@ -78,9 +86,10 @@ for company in open("companies.txt", "r").readlines():
     print("[*] Saved Individual_Reports/" + company + ".csv")
 
 # make final report
-# tScores.append(['Total Cost', apiCost])
-# with open('report.csv', 'w') as f:
-#     csvwriter = csv.writer(f)
-#     csvwriter.writerow(['Company', 'Mean Score'])
-#     csvwriter.writerows(tScores)
-# print('[*] Saved report.csv')
+with open('report.csv', 'w') as f:
+    csvwriter = csv.writer(f)
+    csvwriter.writerow(['Company', 'Mean Score', 'Elapsed Time'])
+    for company, mean in tScores:
+        elapsed_time = company_times[company]
+        csvwriter.writerow([company, mean, elapsed_time])
+print('[*] Saved report.csv')
