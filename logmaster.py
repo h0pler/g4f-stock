@@ -12,3 +12,8 @@ async def log_start():
 async def log_print(prefix, message):
     async with aiofiles.open(logfile, "a") as file:
         await file.write(prefix + "  " + message + "\n")
+        
+
+async def log_end():
+    async with aiofiles.open(logfile, "a") as file:
+        await file.write(f"\n================= [END] =================\n")
