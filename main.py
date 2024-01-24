@@ -4,7 +4,6 @@ import os
 import time
 import g4f
 from duckduckgo_search import *
-import math
 
 print("g4f " + g4f.version.get_package_version("g4f"))  # check version
 print("start")
