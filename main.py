@@ -28,11 +28,13 @@ company_times = {}
 if not os.path.isdir("Individual_Reports"):
     os.mkdir("Individual_Reports")
 
+
 def askGPT(prompt):
     resp = g4f.ChatCompletion.create(
         model="gpt-4", provider=g4f.Provider.Bing, messages=prompt
     )
     return resp
+
 
 # for every company in companies.txt
 for company in open("companies.txt", "r").readlines():
@@ -106,13 +108,13 @@ for company in open("companies.txt", "r").readlines():
 today = datetime.date.today()
 report_filename = f"report_{today.strftime('%Y-%m-%d')}.csv"
 
-with open(report_filename, 'w') as f:
+with open(report_filename, "w") as f:
     csvwriter = csv.writer(f)
-    csvwriter.writerow(['Company', 'Mean Score', 'Elapsed Time'])
+    csvwriter.writerow(["Company", "Mean Score", "Elapsed Time"])
     for company, mean in tScores:
         elapsed_time = company_times[company]
         csvwriter.writerow([company, mean, elapsed_time])
-print('[*] Saved report_' + today.strftime('%Y-%m-%d') + '.csv')
-lm.log_print("", "[*] Saved report_" + today.strftime('%Y-%m-%d') + ".csv")
+print("[*] Saved report_" + today.strftime("%Y-%m-%d") + ".csv")
+lm.log_print("", "[*] Saved report_" + today.strftime("%Y-%m-%d") + ".csv")
 
 lm.log_end()

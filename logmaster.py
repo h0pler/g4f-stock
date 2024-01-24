@@ -1,19 +1,23 @@
-import aiofiles
+import os
 import datetime
 
 logfile = datetime.datetime.now().strftime("logs/%y%m%d-%H:%M:%S.log")
 
+def create_logs_directory():
+    if not os.path.exists("logs"):
+        os.makedirs("logs")
 
-async def log_start():
-    async with aiofiles.open(logfile, "a") as file:
-        await file.write(f"\n\n================= [LOG] =================\n")
+def log_start():
+    create_logs_directory()
+    with open(logfile, "a") as file:
+        file.write("\n\n================= [LOG] =================\n")
 
+def log_print(prefix, message):
+    create_logs_directory()
+    with open(logfile, "a") as file:
+        file.write(prefix + "  " + message + "\n")
 
-async def log_print(prefix, message):
-    async with aiofiles.open(logfile, "a") as file:
-        await file.write(prefix + "  " + message + "\n")
-        
-
-async def log_end():
-    async with aiofiles.open(logfile, "a") as file:
-        await file.write(f"\n================= [END] =================\n")
+def log_end():
+    create_logs_directory()
+    with open(logfile, "a") as file:
+        file.write("\n================= [END] =================\n")
