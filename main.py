@@ -10,9 +10,9 @@ import logmaster as lm
 lm.log_start()
 
 print("g4f " + g4f.version.get_package_version("g4f"))
-lm.log_print("", "g4f " + g4f.version.get_package_version("g4f"))
+lm.log_print("g4f " + g4f.version.get_package_version("g4f"))
 print("start")
-lm.log_print("", "program start")
+lm.log_print("program start")
 
 sysPrompt = """
 You are a financial advisor. 
@@ -35,7 +35,7 @@ def askGPT(prompt):
             model="gpt-4", provider=g4f.Provider.Bing, messages=prompt
         )
     except Exception as e:
-        lm.log_print("", e)
+        lm.log_print(e)
         lm.log_end()
         print(e)
         exit(-1)
@@ -50,12 +50,12 @@ def process_headline(company, sysPrompt):
     index = 0
     conversation = [{"role": "system", "content": sysPrompt}]
     # print("[sysPrompt] \033[92m" + sysPrompt + "\033[0m")
-    # lm.log_print("", "[sysPrompt] " + sysPrompt)
+    # lm.log_print("[sysPrompt] " + sysPrompt)
     answer = askGPT(conversation)
     message = {"role": "user", "content": f"Assistant: {answer}"}
     conversation.append(message)
     print("[answer] \033[94m" + answer + "\033[0m")
-    lm.log_print("", "[answer] " + answer)
+    lm.log_print("[answer] " + answer)
     print(
         "--------------------------------------Starting Analysis--------------------------------------"
     )
@@ -65,10 +65,10 @@ def process_headline(company, sysPrompt):
     for i in r:
         index += 1
         print("[index] " + str(index))  # logging
-        lm.log_print("", "[index] " + str(index))
+        lm.log_print("[index] " + str(index))
         headline = i["title"]
         print("[headline] \033[92m" + headline + "\033[0m")
-        lm.log_print("", "[headline] " + headline)
+        lm.log_print("[headline] " + headline)
         message = {"role": "user", "content": f"HEADLINE: {headline}"}
         conversation.append(message)
         try:
@@ -80,29 +80,29 @@ def process_headline(company, sysPrompt):
             conversation.append(message)
             answer = answer.replace("\n\n", "\n")
             print("[answer] \033[94m" + str(answer) + "\033[0m")
-            lm.log_print("", "[answer] " + str(answer))
+            lm.log_print("[answer] " + str(answer))
             score = float(re.findall(r"-?\d+\.\d+", answer)[0])
             print("[score] " + str(score))
-            lm.log_print("", "[score] " + str(score))
+            lm.log_print("[score] " + str(score))
             scores.append([headline, score])
             sum += score
             sum = round(sum, 2)
             print("[sum] " + str(sum))  # logging
-            lm.log_print("", "[sum] " + str(sum))
+            lm.log_print("[sum] " + str(sum))
         except Exception as e:
             print("\033[91m" + str(e) + "\033[0m")
-            lm.log_print("", str(e))
+            lm.log_print(str(e))
             scores.append([headline, ""])
             # print("[answer] " + "\033[31mERROR!\033[0m")  # logging
-            # lm.log_print("", "[answer] " + "ERROR!")
+            # lm.log_print("[answer] " + "ERROR!")
             print("[score] " + "\033[91mERROR!\033[0m")  # logging
-            lm.log_print("", "[score] " + "ERROR!")
+            lm.log_print("[score] " + "ERROR!")
         print("")
-        lm.log_print("", "")
+        lm.log_print("")
 
     mean = sum / index
     print("[mean] " + str(mean))  # logging
-    lm.log_print("", "[mean] " + str(mean))
+    lm.log_print("[mean] " + str(mean))
     scores.append(["Mean Score", mean])
     tScores.append([company, mean])
     end_time = time.time()
@@ -114,17 +114,17 @@ def process_headline(company, sysPrompt):
         csvwriter.writerow(["Headline", "Score"])
         csvwriter.writerows(scores)
     print("[*] Saved Individual_Reports/" + company + ".csv")
-    lm.log_print("", "[*] Saved Individual_Reports/" + company + ".csv")
+    lm.log_print("[*] Saved Individual_Reports/" + company + ".csv")
 
 
 # for every company in companies.txt
 for company in open("companies.txt", "r").readlines():
     company = company.strip()
+    lm.log_print("[company] " + company)
     process_headline(company, sysPrompt)
 
 # make final report
-today = datetime.date.today()
-report_filename = f"report_{today.strftime('%Y-%m-%d')}.csv"
+report_filename = f"report_{datetime.datetime.now().strftime("%y%m%d-%H:%M:%S")}.csv"
 
 if not os.path.isdir("final_reports"):
     os.mkdir("final_reports")
@@ -134,9 +134,9 @@ with open("final_reports/" + report_filename, "w") as f:
     for company, mean in tScores:
         elapsed_time = company_times[company]
         csvwriter.writerow([company, mean, elapsed_time])
-print("[*] Saved final_reports/report_" + today.strftime("%Y-%m-%d") + ".csv")
+print("[*] Saved final_reports/" + report_filename)
 lm.log_print(
-    "", "[*] Saved final_reports/report_" + today.strftime("%Y-%m-%d") + ".csv"
+    "", "[*] Saved final_reports/" + report_filename
 )
 
 lm.log_end()
