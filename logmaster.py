@@ -12,10 +12,11 @@ def log_start():
     with open(logfile, "a") as file:
         file.write("\n================= [LOG] =================\n")
 
-def log_print(prefix, message):
+def log_print(message: str):
     create_logs_directory()
     with open(logfile, "a") as file:
-        file.write(prefix + "  " + message + "\n")
+        msg = message.replace("\n", "\n  ")
+        file.write("  " + msg + "\n")
 
 def log_end():
     create_logs_directory()
