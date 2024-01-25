@@ -10,9 +10,9 @@ import logmaster as lm
 lm.log_start()
 
 print("g4f " + g4f.version.get_package_version("g4f"))
-lm.log_print("INFO", "g4f " + g4f.version.get_package_version("g4f"))
+lm.log_print("", "g4f " + g4f.version.get_package_version("g4f"))
 print("start")
-lm.log_print("INFO", "program start")
+lm.log_print("", "program start")
 
 sysPrompt = """
 You are a financial advisor. 
@@ -39,26 +39,26 @@ def askGPT(prompt):
         lm.log_end()
         print(e)
         exit(-1)
-        
+
     return resp
 
 
-# for every company in companies.txt
-for company in open("companies.txt", "r").readlines():
-    company = company.strip()
+def process_headline(company, sysPrompt):
     scores = []
     sysPrompt = sysPrompt.format(company)
     sum = 0
     index = 0
     conversation = [{"role": "system", "content": sysPrompt}]
-    print("[sysPrompt] \033[92m" + sysPrompt + "\033[0m")
-    lm.log_print("", "[sysPrompt] " + sysPrompt)
+    # print("[sysPrompt] \033[92m" + sysPrompt + "\033[0m")
+    # lm.log_print("", "[sysPrompt] " + sysPrompt)
     answer = askGPT(conversation)
     message = {"role": "user", "content": f"Assistant: {answer}"}
     conversation.append(message)
     print("[answer] \033[94m" + answer + "\033[0m")
     lm.log_print("", "[answer] " + answer)
-    print("--------------------------------------Starting Analysis--------------------------------------")
+    print(
+        "--------------------------------------Starting Analysis--------------------------------------"
+    )
     ddgs = DDGS()
     r = ddgs.news(company, safesearch="Off", timelimit="d")
     start_time = time.time()
@@ -116,6 +116,12 @@ for company in open("companies.txt", "r").readlines():
     print("[*] Saved Individual_Reports/" + company + ".csv")
     lm.log_print("", "[*] Saved Individual_Reports/" + company + ".csv")
 
+
+# for every company in companies.txt
+for company in open("companies.txt", "r").readlines():
+    company = company.strip()
+    process_headline(company, sysPrompt)
+
 # make final report
 today = datetime.date.today()
 report_filename = f"report_{today.strftime('%Y-%m-%d')}.csv"
@@ -129,6 +135,8 @@ with open("final_reports/" + report_filename, "w") as f:
         elapsed_time = company_times[company]
         csvwriter.writerow([company, mean, elapsed_time])
 print("[*] Saved final_reports/report_" + today.strftime("%Y-%m-%d") + ".csv")
-lm.log_print("", "[*] Saved final_reports/report_" + today.strftime("%Y-%m-%d") + ".csv")
+lm.log_print(
+    "", "[*] Saved final_reports/report_" + today.strftime("%Y-%m-%d") + ".csv"
+)
 
 lm.log_end()
