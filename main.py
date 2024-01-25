@@ -80,12 +80,14 @@ for company in open("companies.txt", "r").readlines():
             lm.log_print("", "[index] " + str(index))
         except Exception as e:
             print(e)
+            lm.log_print("", str(e))
             scores.append([headline, ""])
             print("[answer] " + "ERROR!")  # logging
             lm.log_print("", "[answer] " + "ERROR!")
             print("[score] " + "ERROR!")  # logging
             lm.log_print("", "[score] " + "ERROR!")
         print("")
+        lm.log_print("", "")
 
     mean = sum / index
     print("[mean] " + str(mean))  # logging
@@ -101,6 +103,7 @@ for company in open("companies.txt", "r").readlines():
         csvwriter.writerow(["Headline", "Score"])
         csvwriter.writerows(scores)
     print("[*] Saved Individual_Reports/" + company + ".csv")
+    lm.log_print("", "[*] Saved Individual_Reports/" + company + ".csv")
 
 # make final report
 today = datetime.date.today()
