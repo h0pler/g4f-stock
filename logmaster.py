@@ -10,7 +10,7 @@ def create_logs_directory():
 def log_start():
     create_logs_directory()
     with open(logfile, "a") as file:
-        file.write("\n\n================= [LOG] =================\n")
+        file.write("\n================= [LOG] =================\n")
 
 def log_print(prefix, message):
     create_logs_directory()
