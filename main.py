@@ -120,13 +120,15 @@ for company in open("companies.txt", "r").readlines():
 today = datetime.date.today()
 report_filename = f"report_{today.strftime('%Y-%m-%d')}.csv"
 
-with open(report_filename, "w") as f:
+if not os.path.isdir("final_reports"):
+    os.mkdir("final_reports")
+with open("final_reports/" + report_filename, "w") as f:
     csvwriter = csv.writer(f)
     csvwriter.writerow(["Company", "Mean Score", "Elapsed Time"])
     for company, mean in tScores:
         elapsed_time = company_times[company]
         csvwriter.writerow([company, mean, elapsed_time])
-print("[*] Saved report_" + today.strftime("%Y-%m-%d") + ".csv")
-lm.log_print("", "[*] Saved report_" + today.strftime("%Y-%m-%d") + ".csv")
+print("[*] Saved final_reports/report_" + today.strftime("%Y-%m-%d") + ".csv")
+lm.log_print("", "[*] Saved final_reports/report_" + today.strftime("%Y-%m-%d") + ".csv")
 
 lm.log_end()
