@@ -30,9 +30,16 @@ if not os.path.isdir("Individual_Reports"):
 
 
 def askGPT(prompt):
-    resp = g4f.ChatCompletion.create(
-        model="gpt-4", provider=g4f.Provider.Bing, messages=prompt
-    )
+    try:
+        resp = g4f.ChatCompletion.create(
+            model="gpt-4", provider=g4f.Provider.Bing, messages=prompt
+        )
+    except Exception as e:
+        lm.log_print("", e)
+        lm.log_end()
+        print(e)
+        exit(-1)
+        
     return resp
 
 
@@ -44,19 +51,23 @@ for company in open("companies.txt", "r").readlines():
     sum = 0
     index = 0
     conversation = [{"role": "system", "content": sysPrompt}]
-    print("[sysPrompt] " + sysPrompt)
+    print("[sysPrompt] \033[92m" + sysPrompt + "\033[0m")
     lm.log_print("", "[sysPrompt] " + sysPrompt)
     answer = askGPT(conversation)
     message = {"role": "user", "content": f"Assistant: {answer}"}
     conversation.append(message)
-    print("[answer] " + answer)
+    print("[answer] \033[94m" + answer + "\033[0m")
     lm.log_print("", "[answer] " + answer)
+    print("--------------------------------------Starting Analysis--------------------------------------")
     ddgs = DDGS()
     r = ddgs.news(company, safesearch="Off", timelimit="d")
     start_time = time.time()
     for i in r:
+        index += 1
+        print("[index] " + str(index))  # logging
+        lm.log_print("", "[index] " + str(index))
         headline = i["title"]
-        print("[headline] " + headline)
+        print("[headline] \033[92m" + headline + "\033[0m")
         lm.log_print("", "[headline] " + headline)
         message = {"role": "user", "content": f"HEADLINE: {headline}"}
         conversation.append(message)
@@ -67,7 +78,8 @@ for company in open("companies.txt", "r").readlines():
             else:
                 message["content"] = f"{answer}"
             conversation.append(message)
-            print("[answer] " + str(answer))
+            answer = answer.replace("\n\n", "\n")
+            print("[answer] \033[94m" + str(answer) + "\033[0m")
             lm.log_print("", "[answer] " + str(answer))
             score = float(re.findall(r"-?\d+\.\d+", answer)[0])
             print("[score] " + str(score))
@@ -77,16 +89,13 @@ for company in open("companies.txt", "r").readlines():
             sum = round(sum, 2)
             print("[sum] " + str(sum))  # logging
             lm.log_print("", "[sum] " + str(sum))
-            index += 1
-            print("[index] " + str(index))  # logging
-            lm.log_print("", "[index] " + str(index))
         except Exception as e:
-            print(e)
+            print("\033[91m" + str(e) + "\033[0m")
             lm.log_print("", str(e))
             scores.append([headline, ""])
-            print("[answer] " + "ERROR!")  # logging
-            lm.log_print("", "[answer] " + "ERROR!")
-            print("[score] " + "ERROR!")  # logging
+            # print("[answer] " + "\033[31mERROR!\033[0m")  # logging
+            # lm.log_print("", "[answer] " + "ERROR!")
+            print("[score] " + "\033[91mERROR!\033[0m")  # logging
             lm.log_print("", "[score] " + "ERROR!")
         print("")
         lm.log_print("", "")
